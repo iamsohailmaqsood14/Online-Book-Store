@@ -268,3 +268,353 @@ public:
         cout << "Gift card added successfully!" << endl;
     }
 };
+
+// Define the BookManagementSystem class
+class BookManagementSystem {
+private:
+    Book* books[100];
+    int bookCount = 0;
+
+public:
+    // Function to add book (accessible to admin)
+    void addBook(User& user, int id, string title, string author, string genre, string description, int quantity, double price) {
+        if (user.isAdmin) {
+            books[bookCount++] = new Book(id, title, author, genre, description, quantity, price);
+            cout << "Book added successfully!" << endl;
+        } else {
+            cout << "Insufficient privilege to add book." << endl;
+        }
+    }
+
+    // Function to display books
+    void displayBooks() const {
+        cout << "Book List:" << endl;
+        for (int i = 0; i < bookCount; ++i) {
+            cout << "ID: " << books[i]->getId() << " | Title: " << books[i]->getTitle()
+                 << " | Author: " << books[i]->getAuthor()
+                 << " | Genre: " << books[i]->getGenre()
+                 << " | Quantity: " << books[i]->getQuantity() << " | Price: $" << books[i]->getPrice() << endl;
+        }
+    }
+
+    // Function to search books by title
+    void searchBookByTitle(const string& searchTerm) const {
+        bool found = false;
+        cout << "Search Results:" << endl;
+        for (int i = 0; i < bookCount; ++i) {
+            if (books[i]->getTitle().find(searchTerm) != string::npos) {
+                cout << "ID: " << books[i]->getId() << " | Title: " << books[i]->getTitle()
+                     << " | Author: " << books[i]->getAuthor()
+                     << " | Genre: " << books[i]->getGenre()
+                     << " | Quantity: " << books[i]->getQuantity() << " | Price: $" << books[i]->getPrice() << endl;
+                found = true;
+            }
+        }
+        if (!found)
+            cout << "No matching books found." << endl;
+    }
+
+    // Function to filter books by price range
+    void filterBooksByPrice(double minPrice, double maxPrice) const {
+        bool found = false;
+        cout << "Filtered Books:" << endl;
+        for (int i = 0; i < bookCount; ++i) {
+            if (books[i]->getPrice() >= minPrice && books[i]->getPrice() <= maxPrice) {
+                cout << "ID: " << books[i]->getId() << " | Title: " << books[i]->getTitle()
+                     << " | Author: " << books[i]->getAuthor()
+                     << " | Genre: " << books[i]->getGenre()
+                     << " | Quantity: " << books[i]->getQuantity() << " | Price: $" << books[i]->getPrice() << endl;
+                found = true;
+            }
+        }
+        if (!found)
+            cout << "No books found in the specified price range." << endl;
+    }
+
+    // Function to get a book by its ID
+    Book* getBookById(int bookId) const {
+        for (int i = 0; i < bookCount; ++i) {
+            if (books[i]->getId() == bookId) {
+                return books[i];
+            }
+        }
+        return nullptr; // Book not found
+    }
+};
+
+// Function to write user data to file (for registration)
+void writeUserToFile(const string& username, const string& password) {
+    ofstream writefile(username + ".txt");
+    if (writefile.is_open()) {
+        writefile << password;
+        writefile.close();
+        cout << "User registered successfully!\n";
+    } else {
+        cerr << "Error writing to file.\n";
+    }
+}
+
+// Function to register a new user
+void registerUser() {
+    string username, password, password2;
+
+    cout << "Please enter your username: ";
+    cin >> username;
+
+    cout << "Please enter the password: ";
+    cin >> password;
+
+    cout << "Please re-enter your password: ";
+    cin >> password2;
+
+    if (password == password2) {
+        writeUserToFile(username, password);
+    } else {
+        cout << "Passwords do not match. Registration failed.\n";
+    }
+}
+
+// Function to login an existing user
+bool loginUser() {
+    string username, password;
+
+    cout << "Please enter your username: ";
+    cin >> username;
+
+    cout << "Please enter your password: ";
+    cin >> password;
+
+    // Logic to verify username and password from stored data
+    // For simplicity, we'll assume a successful login here
+    return true;
+}
+
+// Function to logout
+void logout() {
+    // For this simple console-based application, logging out just means returning to the login/register screen
+    cout << "Logged out successfully.\n";
+}
+
+int main() {
+    cout << "Welcome to the Online Book Store!" << endl;
+
+    while (true) {
+        // Ask user to register or login
+        cout << "1. Register" << endl;
+        cout << "2. Login" << endl;
+        cout << "3. Exit" << endl;
+        cout << "Enter your choice: ";
+        int choice;
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                registerUser();
+                break;
+            case 2:
+                if (!loginUser()) {
+                    cout << "Login failed. Exiting..." << endl;
+                    return 0;
+                }
+                // After successful registration or login, proceed to online Book Store
+                cout << "Welcome to the online Book Store!" << endl;
+                {
+                    BookManagementSystem bms;
+
+                    // Create an admin user
+                    User admin("admin", "adminpassword", true);
+
+                    // Create a shopping cart for the user
+                    User currentUser("currentuser", "currentuserpassword");
+
+                    while (true) {
+                        cout << "online Book Store|Read your heart out" << endl;
+                        cout << "1. Add Book" << endl;
+                        cout << "2. Display Books" << endl;
+                        cout << "3. Search Book by Title" << endl;
+                        cout << "4. Filter Books by Price Range" << endl;
+                        cout << "5. Add to Cart" << endl;
+                        cout << "6. View Shopping Cart" << endl;
+                        cout << "7. Edit Profile" << endl;
+                        cout << "8. Place Order" << endl;
+                        cout << "9. View Order History" << endl;
+                        cout << "10. Track Order" << endl;
+                        cout << "11. Add Gift Card" << endl;
+                        cout << "12. Add Review and Rating" << endl;
+                        cout << "13. Add to Wish List" << endl;
+                        cout << "14. Manage Inventory" << endl; // New option for inventory management
+                        cout << "15. Logout" << endl;
+                        cout << "16. Exit" << endl;
+                        cout << "Enter your choice: ";
+                        cin >> choice;
+                        switch (choice) {
+                            case 1: {
+                                int id, quantity;
+                                string title, author, genre, description;
+                                double price;
+                                cout << "Enter book ID: ";
+                                cin >> id;
+                                cout << "Enter book title: ";
+                                cin >> title;
+                                cout << "Enter book author: ";
+                                cin >> author;
+                                cout << "Enter book genre: ";
+                                cin >> genre;
+                                cout << "Enter book description: ";
+                                cin.ignore(); // Ignore newline character
+                                getline(cin, description); // Read entire line
+                                cout << "Enter book quantity: ";
+                                cin >> quantity;
+                                cout << "Enter book price: ";
+                                cin >> price;
+                                bms.addBook(admin, id, title, author, genre, description, quantity, price);
+                                break;
+                            }
+                            case 2:
+                                bms.displayBooks();
+                                break;
+                            case 3:
+                                // Search book by title
+                            {
+                                string searchTerm;
+                                cout << "Enter book title to search: ";
+                                cin.ignore(); // Ignore newline character
+                                getline(cin, searchTerm);
+                                bms.searchBookByTitle(searchTerm);
+                            }
+                            break;
+                            case 4:
+                                // Filter books by price range
+                            {
+                                double minPrice, maxPrice;
+                                cout << "Enter minimum price: ";
+                                cin >> minPrice;
+                                cout << "Enter maximum price: ";
+                                cin >> maxPrice;
+                                bms.filterBooksByPrice(minPrice, maxPrice);
+                            }
+                            break;
+                            case 5: {
+                                // Add to Cart functionality
+                                int bookId;
+                                cout << "Enter book ID to add to cart: ";
+                                cin >> bookId;
+                                Book* bookToAdd = bms.getBookById(bookId);
+                                if (bookToAdd != nullptr) {
+                                    currentUser.addToCart(bookToAdd);
+                                } else {
+                                    cout << "Book not found!" << endl;
+                                }
+                                break;
+                            }
+                            case 6:
+                                currentUser.displayCart();
+                                break;
+                            case 7:
+                                currentUser.editProfile();
+                            case 8:
+                                currentUser.placeOrder();
+                                break;
+                            case 9:
+                                currentUser;
+                                break;
+                            case 10: {
+                                string orderID;
+                                cout << "Enter order ID to track: ";
+                                cin >> orderID;
+                                currentUser.trackOrder(orderID);
+                                break;
+                            }
+                            case 11: {
+                                string giftCard;
+                                cout << "Enter gift card details: ";
+                                cin.ignore(); // Ignore newline character
+                                getline(cin, giftCard);
+                                currentUser.addGiftCard(giftCard);
+                                break;
+                            }
+                            case 12: {
+                                // Add Review and Rating functionality
+                                // Prompt user to enter review text and rating, then call addReview() method on the selected book
+                                int bookId;
+                                string reviewText;
+                                int rating;
+                                cout << "Enter book ID to review: ";
+                                cin >> bookId;
+                                cout << "Enter your review: ";
+                                cin.ignore(); // Ignore newline character
+                                getline(cin, reviewText);
+                                cout << "Enter rating (1 to 5): ";
+                                cin >> rating;
+                                // getBookById(bookId)->addReview(reviewText, rating); // Implement getBookById function
+                                cout << "Review added successfully!" << endl; // Remove this line once implemented getBookById
+                                break;
+                            }
+                            case 13: {
+                                // Add to Wish List functionality
+                                int bookId;
+                                cout << "Enter book ID to add to wish list: ";
+                                cin >> bookId;
+                                Book* bookToAdd = bms.getBookById(bookId);
+                                if (bookToAdd != nullptr) {
+                                    currentUser.addToWishList(bookToAdd);
+                                } else {
+                                    cout << "Book not found!" << endl;
+                                }
+                                break;
+                            }
+                             case 14:
+                                // Manage Inventory
+                                {
+                                    int bookId, quantityToAdd, newQuantity;
+                                    cout << "Enter book ID to manage inventory: ";
+                                    cin >> bookId;
+                                    Book* bookToManage = bms.getBookById(bookId);
+                                    if (bookToManage != nullptr) {
+                                        cout << "Current Stock Level: " << bookToManage->getQuantity() << endl;
+                                        cout << "1. Add Stock" << endl;
+                                        cout << "2. Update Stock Quantity" << endl;
+                                        cout << "Enter your choice: ";
+                                        int inventoryChoice;
+                                        cin >> inventoryChoice;
+                                        switch (inventoryChoice) {
+                                            case 1:
+                                                cout << "Enter quantity to add: ";
+                                                cin >> quantityToAdd;
+                                                bookToManage->addStock(quantityToAdd);
+                                                break;
+                                            case 2:
+                                                cout << "Enter new quantity: ";
+                                                cin >> newQuantity;
+                                                bookToManage->updateStock(newQuantity);
+                                                break;
+                                            default:
+                                                cout << "Invalid choice." << endl;
+                                        }
+                                    } else {
+                                        cout << "Book not found!" << endl;
+                                    }
+                                    break;
+                                }
+                            case 15:
+                                logout();
+                                break;
+                            case 16:
+                                cout << "Exiting..." << endl;
+                                return 0;
+                            default:
+                                cout << "Invalid choice. Please try again." << endl;
+                        }
+                    }
+                }
+                break;
+            case 3:
+                cout << "Exiting..." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    }
+
+    return 0;
+}
